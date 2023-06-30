@@ -26,7 +26,7 @@ jobs:
       - name: Process Asset URLs
         id: process-assets
         run: |
-          ASSET_URLS=("${asset_urls[@]}")
+          ASSET_URLS=(${{steps.get-assets.outputs.asset_urls}})
           for URL in "${ASSET_URLS[@]}"; do
             echo "Processing asset: $URL"
 
