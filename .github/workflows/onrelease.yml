@@ -49,7 +49,7 @@ jobs:
             
             # Create the Dockerfile
             echo "FROM $BASE_IMAGE" > "$DOCKERFILE_PATH"
-            echo "COPY ./$PLATFORM-VERSION.tar.gz /app.tar.gz" >> "$DOCKERFILE_PATH"
+            echo "RUN curl -L -o /app.tar.gz $URL" >> "$DOCKERFILE_PATH"
             echo "RUN tar zxfp /app.tar.gz" >> "$DOCKERFILE_PATH"
             echo "RUN chmod +x /install-as-service.sh" >> "$DOCKERFILE_PATH"
             echo "CMD /Binner.Web" >> "$DOCKERFILE_PATH"
@@ -59,8 +59,7 @@ jobs:
 
       - name: Commit and Push
         run: |
-          git config user.name "Your Name"
-          git config user.email "youremail@example.com"
+          git config user.name "Devsider"
           git add ./dockerfiles
           git commit -m "Add downloaded assets and Dockerfiles"
           git push
