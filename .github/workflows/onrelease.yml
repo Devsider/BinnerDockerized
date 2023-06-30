@@ -17,7 +17,7 @@ jobs:
       - name: Get Asset URLs
         id: get-assets
         run: |
-          ALL_ASSETS_URL=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases" | grep browser_download_url | cut -d '"' -f 4)
+          ALL_ASSETS_URL=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases" | jq -r '.assets[].browser_download_url')
           echo "::set-output name=asset_urls::$ALL_ASSETS_URL"
 
       - name: Process Asset URLs
