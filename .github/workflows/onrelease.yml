@@ -1,9 +1,10 @@
 name: Download and Add Assets
 
 on:
-  release:
+  workflow_dispatch:
+  repository_dispatch:
     types:
-      - created
+      - release
 
 jobs:
   build:
