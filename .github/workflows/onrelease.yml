@@ -17,14 +17,13 @@ jobs:
       - name: Get Asset URLs
         id: get-assets
         run: |
-          ALL_ASSETS_URL=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases")
-          ASSET_URLS=$(echo "$ALL_ASSETS_URL" | grep -oP '(?<=browser_download_url": ")(.*?)(?=")')
-          echo "::set-output name=asset_urls::$ASSET_URLS"
+          ALL_ASSETS_URL=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases" | grep browser_download_url | cut -d '"' -f 4)
+          echo "asset_urls=$ALL_ASSETS_URL" >> $GITHUB_STATE
 
       - name: Process Asset URLs
         id: process-assets
         run: |
-          ASSET_URLS=${{ steps.get-assets.outputs.asset_urls }}
+          ASSET_URLS=$(cat $GITHUB_STATE | grep -oP '(?<=asset_urls=)(.*)')
           for URL in $ASSET_URLS; do
             echo "Processing asset: $URL"
             
