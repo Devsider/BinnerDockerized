@@ -28,6 +28,10 @@ jobs:
         run: |
           ASSET_URLS=()
           IFS=$'\n' read -rd '' -a ASSET_URLS <<<"${{ steps.get-assets.outputs.asset_urls }}"
+          echo "Number of asset URLs: ${#ASSET_URLS[@]}"
+          echo "Asset URLs:"
+          printf '%s\n' "${ASSET_URLS[@]}"
+
           for URL in "${ASSET_URLS[@]}"; do
             echo "Processing asset: $URL"
 
@@ -65,7 +69,6 @@ jobs:
           done
         env:
           ASSET_URLS: ${{ steps.get-assets.outputs.asset_urls }}
-
 
       - name: Commit and Push
         run: |
