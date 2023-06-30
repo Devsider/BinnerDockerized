@@ -18,13 +18,15 @@ jobs:
         id: get-assets
         run: |
           ALL_ASSETS_URL=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases" | grep browser_download_url | cut -d '"' -f 4)
-          echo "asset_urls=$ALL_ASSETS_URL" >> $GITHUB_STATE
+          while IFS= read -r URL; do
+            echo "asset_urls+=($URL)" >> $GITHUB_ENV
+          done <<< "$ALL_ASSETS_URL"
 
       - name: Process Asset URLs
         id: process-assets
         run: |
-          ASSET_URLS=$(cat $GITHUB_STATE | grep -oP '(?<=asset_urls=)(.*)')
-          for URL in $ASSET_URLS; do
+          ASSET_URLS=("${asset_urls[@]}")
+          for URL in "${ASSET_URLS[@]}"; do
             echo "Processing asset: $URL"
             
             # Extract platform information from the asset URL
