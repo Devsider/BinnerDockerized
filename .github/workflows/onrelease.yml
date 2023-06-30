@@ -13,6 +13,10 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+        
+        
+      - name: Create Dockerfiles Directory
+        run: mkdir dockerfiles
 
       - name: Get Asset URLs
         id: get-assets
