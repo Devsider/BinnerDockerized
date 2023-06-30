@@ -1,9 +1,9 @@
 name: Download and Add Assets
 
 on:
-  repository_dispatch:
+  release:
     types:
-      - release
+      - created
 
 jobs:
   build:
