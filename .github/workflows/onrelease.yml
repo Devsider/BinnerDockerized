@@ -1,6 +1,6 @@
 name: Download and Add Assets
 
-on::
+on:
   workflow_dispatch:
   repository_dispatch:
     types:
