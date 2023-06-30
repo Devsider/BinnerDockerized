@@ -24,7 +24,6 @@ jobs:
         id: process-assets
         run: |
           ASSET_URLS=${{ steps.get-assets.outputs.asset_urls }}
-          IFS=$'\n'
           for URL in $ASSET_URLS; do
             echo "Processing asset: $URL"
             
