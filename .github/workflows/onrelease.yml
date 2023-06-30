@@ -63,6 +63,9 @@ jobs:
             echo "---"
 
           done
+        env:
+          ASSET_URLS: ${{ steps.get-assets.outputs.asset_urls }}
+
 
       - name: Commit and Push
         run: |
