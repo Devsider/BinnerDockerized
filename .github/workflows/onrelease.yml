@@ -18,12 +18,12 @@ jobs:
         id: get-assets
         run: |
           ASSET_URLS=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases" | jq -r '.[].assets[].browser_download_url')
-          echo "ASSET_URLS=${ASSET_URLS}" >> $GITHUB_ENV
+          echo "::set-env name=ASSET_URLS::$ASSET_URLS"
 
       - name: Process Asset URLs
         id: process-assets
         run: |
-          ASSET_URLS=($ASSET_URLS)
+          IFS=$'\n' read -rd '' -a ASSET_URLS <<< "$ASSET_URLS"
           for URL in "${ASSET_URLS[@]}"; do
             echo "Processing asset: $URL"
 
@@ -57,6 +57,8 @@ jobs:
             echo "Dockerfile for $URL:"
             cat "$DOCKERFILE_PATH"
             echo "---"
+
+          done
 
 
       - name: Commit and Push
