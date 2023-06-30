@@ -22,7 +22,6 @@ jobs:
             echo "asset_urls+=($URL)" >> $GITHUB_ENV
             echo "Found asset URL: $URL"
           done <<< "$ALL_ASSETS_URL"
-
       - name: Process Asset URLs
         id: process-assets
         run: |
@@ -69,6 +68,7 @@ jobs:
           done
         env:
           ASSET_URLS: ${{ steps.get-assets.outputs.asset_urls }}
+
 
       - name: Commit and Push
         run: |
