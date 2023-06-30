@@ -16,10 +16,10 @@ jobs:
       - name: Download Assets
         id: download-assets
         run: |
-          ASSETS_URL=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases/latest/assets" | grep browser_download_url | cut -d '"' -f 4)
+          ASSETS_URL=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases/latest/assets" | grep browser_download_url | cut -d '"' -f 4)
           IFS=$'\n'
           for URL in $ASSETS_URL; do
-            curl -LJO -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$URL"
+            curl -LJO -H "Authorization: token ${{ secrets.GH_TOKEN }}" "$URL"
           done
 
       - name: Move Release Zips
