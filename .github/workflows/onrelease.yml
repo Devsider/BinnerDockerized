@@ -20,6 +20,7 @@ jobs:
         run: |
           ASSET_URLS=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases" | jq -r '.[].assets[].browser_download_url')
 
+          IFS=$'\n' read -rd '' -a ASSET_URLS_ARRAY <<<"$ASSET_URLS"
           for URL in "${ASSET_URLS[@]}"; do
             echo "Processing asset: $URL"
 
