@@ -47,6 +47,9 @@ jobs:
               BASE_IMAGE="ubuntu:14.04"
             fi
             
+            # Create the Dockerfile directory if it doesn't exist
+            mkdir -p ./dockerfiles
+            
             # Create the Dockerfile
             echo "FROM $BASE_IMAGE" > "$DOCKERFILE_PATH"
             echo "RUN curl -L -o /app.tar.gz $URL" >> "$DOCKERFILE_PATH"
