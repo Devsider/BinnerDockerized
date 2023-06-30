@@ -52,6 +52,7 @@ jobs:
             echo "RUN curl -L -o /app.tar.gz $URL" >> "$DOCKERFILE_PATH"
             echo "RUN tar zxfp /app.tar.gz" >> "$DOCKERFILE_PATH"
             echo "RUN chmod +x /install-as-service.sh" >> "$DOCKERFILE_PATH"
+            echo "EXPOSE 8090" >> "$DOCKERFILE_PATH"
             echo "CMD /Binner.Web" >> "$DOCKERFILE_PATH"
             
           done
