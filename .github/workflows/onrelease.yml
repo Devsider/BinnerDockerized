@@ -17,9 +17,10 @@ jobs:
       - name: Get Asset URLs
         id: get-assets
         run: |
-          ALL_ASSETS_URL=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases" | grep browser_download_url | cut -d '"' -f 4)
+          ALL_ASSETS_URL=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/:owner/:repo/releases/latest" | grep browser_download_url | cut -d '"' -f 4)
           while IFS= read -r URL; do
             echo "asset_urls+=($URL)" >> $GITHUB_ENV
+            echo "Found asset URL: $URL"
           done <<< "$ALL_ASSETS_URL"
 
       - name: Process Asset URLs
@@ -28,7 +29,7 @@ jobs:
           ASSET_URLS=("${asset_urls[@]}")
           for URL in "${ASSET_URLS[@]}"; do
             echo "Processing asset: $URL"
-            
+
             # Extract platform information from the asset URL
             PLATFORM=$(echo "$URL" | awk -F_ '{print $2}')
             
@@ -56,11 +57,26 @@ jobs:
             echo "CMD /Binner.Web" >> "$DOCKERFILE_PATH"
             
           done
-    
 
       - name: Commit and Push
         run: |
-          git config user.name "Devsider"
+          git config user.name "Your Name"
+          git config user.email "youremail@example.com"
           git add ./dockerfiles
-          git commit -m "Add downloaded assets and Dockerfiles"
+          git commit -m "Add Dockerfiles"
           git push
+
+      - name: Set Asset URLs Output
+        run: |
+          ASSET_URLS=("${asset_urls[@]}")
+          OUTPUT=""
+          for URL in "${ASSET_URLS[@]}"; do
+            OUTPUT+="$URL,"
+          done
+          echo "asset_urls=${OUTPUT%,}" >> $GITHUB_ENV
+
+      - name: Debug Output
+        run: |
+          echo "Debug Output:"
+          echo "asset_urls=${OUTPUT%,}"
+          cat ./dockerfiles/*
