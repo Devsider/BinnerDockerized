@@ -1,0 +1,33 @@
+name: Download and Add Assets
+
+on:
+  repository_dispatch:
+    types:
+      - release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Download Assets
+        id: download-assets
+        run: |
+          ASSETS_URL=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases/latest/assets" | grep browser_download_url | cut -d '"' -f 4)
+          IFS=$'\n'
+          for URL in $ASSETS_URL; do
+            curl -LJO -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$URL"
+          done
+
+      - name: Move Release Zips
+        run: mv ./*.zip releases/
+
+      - name: Commit and Push
+        run: |
+          git config user.name "Devsider"
+          git add releases/*
+          git commit -m "Add downloaded assets"
+          git push
