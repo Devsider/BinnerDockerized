@@ -2,4 +2,5 @@ FROM ubuntu:14.04
 RUN curl -L -o /app.tar.gz https://github.com/replaysMike/Binner/releases/download/v2.6.0/BinnerSetup-win10x64-2.6.0.exe
 RUN tar zxfp /app.tar.gz
 RUN chmod +x /install-as-service.sh
+EXPOSE 8090
 CMD /Binner.Web
