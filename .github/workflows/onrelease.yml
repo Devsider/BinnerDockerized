@@ -56,6 +56,11 @@ jobs:
             echo "EXPOSE 8090" >> "$DOCKERFILE_PATH"
             echo "CMD /Binner.Web" >> "$DOCKERFILE_PATH"
 
+            # Debug output for each asset URL
+            echo "Dockerfile for $URL:"
+            cat "$DOCKERFILE_PATH"
+            echo "---"
+
           done
 
       - name: Commit and Push
