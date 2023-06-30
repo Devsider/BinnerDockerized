@@ -14,21 +14,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Get Asset URLs
-        id: get-assets
-        run: |
-          ASSET_URLS=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases" | jq -r '.[].assets[].browser_download_url')
-
-          echo "ASSET_URLS: $ASSET_URLS"
-          IFS=$'\n' read -rd '' -a ASSET_URLS_ARRAY <<<"$ASSET_URLS"
-          echo "Number of asset URLs: ${#ASSET_URLS_ARRAY[@]}"
-          echo "Asset URLs:"
-          printf '%s\n' "${ASSET_URLS_ARRAY[@]}"
 
       - name: Process Asset URLs
         id: process-assets
         run: |
-          IFS=$'\n' read -rd '' -a ASSET_URLS <<< "$ASSET_URLS"
+          ASSET_URLS=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases" | jq -r '.[].assets[].browser_download_url')
+
           for URL in "${ASSET_URLS[@]}"; do
             echo "Processing asset: $URL"
 
