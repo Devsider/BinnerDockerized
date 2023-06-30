@@ -59,6 +59,8 @@ jobs:
 
       - name: Commit and Push
         run: |
+          git config user.name "Devsider"
+          git config user.email "youremail@example.com"
           git add ./dockerfiles
           git commit -m "Add Dockerfiles"
           git push
