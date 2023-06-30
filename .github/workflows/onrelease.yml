@@ -1,6 +1,6 @@
 name: Download and Add Assets
 
-on:
+on::
   workflow_dispatch:
   repository_dispatch:
     types:
@@ -14,21 +14,51 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Download Assets
-        id: download-assets
+      - name: Get Asset URLs
+        id: get-assets
         run: |
-          ASSETS_URL=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases/latest/assets" | grep browser_download_url | cut -d '"' -f 4)
+          ALL_ASSETS_URL=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases/latest" | grep browser_download_url | cut -d '"' -f 4)
+          echo "::set-output name=asset_urls::$ALL_ASSETS_URL"
+
+      - name: Process Asset URLs
+        id: process-assets
+        run: |
+          ASSET_URLS=${{ steps.get-assets.outputs.asset_urls }}
           IFS=$'\n'
-          for URL in $ASSETS_URL; do
-            curl -LJO -H "Authorization: token ${{ secrets.GH_TOKEN }}" "$URL"
+          for URL in $ASSET_URLS; do
+            echo "Processing asset: $URL"
+            
+            # Extract platform information from the asset URL
+            PLATFORM=$(echo "$URL" | awk -F_ '{print $2}')
+            
+            # Set up the Dockerfile based on the platform
+            if [[ $PLATFORM == "linux-arm" ]]; then
+              DOCKERFILE_PATH="./dockerfiles/Dockerfile-linux-arm"
+              BASE_IMAGE="arm32v7/ubuntu:14.04"
+            elif [[ $PLATFORM == "linux-arm64" ]]; then
+              DOCKERFILE_PATH="./dockerfiles/Dockerfile-linux-arm64"
+              BASE_IMAGE="arm64v8/ubuntu:14.04"
+            else
+              DOCKERFILE_PATH="./dockerfiles/Dockerfile-x64"
+              BASE_IMAGE="ubuntu:14.04"
+            fi
+            
+            # Create the Dockerfile
+            echo "FROM $BASE_IMAGE" > "$DOCKERFILE_PATH"
+            echo "COPY ./$PLATFORM-VERSION.tar.gz /app.tar.gz" >> "$DOCKERFILE_PATH"
+            echo "RUN tar zxfp /app.tar.gz" >> "$DOCKERFILE_PATH"
+            echo "RUN chmod +x /install-as-service.sh" >> "$DOCKERFILE_PATH"
+            echo "CMD /Binner.Web" >> "$DOCKERFILE_PATH"
+            
           done
 
-      - name: Move Release Zips
-        run: mv ./*.zip releases/
+      - name: Move Assets
+        run: mv ./*.zip path/to/target/folder
 
       - name: Commit and Push
         run: |
-          git config user.name "Devsider"
-          git add releases/*
-          git commit -m "Add downloaded assets"
+          git config user.name "Your Name"
+          git config user.email "youremail@example.com"
+          git add ./dockerfiles
+          git commit -m "Add downloaded assets and Dockerfiles"
           git push
