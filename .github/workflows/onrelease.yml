@@ -21,7 +21,7 @@ jobs:
       - name: Get Asset URLs
         id: get-assets
         run: |
-          ALL_ASSETS_URL=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases/latest" | grep browser_download_url | cut -d '"' -f 4)
+          ALL_ASSETS_URL=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" "https://api.github.com/repos/replaysMike/Binner/releases" | grep browser_download_url | cut -d '"' -f 4)
           echo "::set-output name=asset_urls::$ALL_ASSETS_URL"
 
       - name: Process Asset URLs
@@ -55,9 +55,7 @@ jobs:
             echo "CMD /Binner.Web" >> "$DOCKERFILE_PATH"
             
           done
-
-      - name: Move Assets
-        run: mv ./*.zip path/to/target/folder
+    
 
       - name: Commit and Push
         run: |
