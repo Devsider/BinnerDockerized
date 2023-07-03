@@ -25,7 +25,7 @@ jobs:
             echo "::warning::No releases found for the repository."
             exit 0
           fi
-          ASSETS=$(echo "$RELEASES" | jq -r '.[].assets[] | select(.name | contains("linux-x64") or contains("linux-arm")) | .browser_download_url')
+          ASSETS=$(echo "$RELEASES" | jq -r '.[].assets[].browser_download_url')
           echo "::set-output name=assets::${ASSETS}"
 
       - name: Create Dockerfiles
@@ -36,8 +36,7 @@ jobs:
             exit 0
           fi
           for ASSET in $ASSETS; do
-            PLATFORM=$(echo $ASSET | awk -F'/' '{ if ($0 ~ /linux-arm/) print "arm"; else print "x64" }')
-            FILENAME=$(basename $ASSET)
+            PLATFORM=$(basename $ASSET | awk -F'_' '{print $NF}' | awk -F'-' '{print $1}')
             DOCKERFILE="Dockerfile.${PLATFORM}"
             echo "FROM ubuntu:22.04" > $DOCKERFILE
             echo "CMD [\"/bin/bash\"]" >> $DOCKERFILE
