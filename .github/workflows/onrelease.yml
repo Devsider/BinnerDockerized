@@ -20,7 +20,7 @@ jobs:
       - name: Get latest release info
         id: release
         run: |
-          LATEST_RELEASE=$(curl --silent "https://api.github.com/repos/<username>/<repository>/releases/latest" | jq -r '.tag_name')
+          LATEST_RELEASE=$(curl --silent "https://api.github.com/repos/replaysMike/Binner/releases/latest" | jq -r '.tag_name')
           if [[ -z "$LATEST_RELEASE" ]]; then
             echo "::error::Failed to retrieve latest release information."
             exit 1
