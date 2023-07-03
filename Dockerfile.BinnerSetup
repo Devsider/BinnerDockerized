@@ -1,0 +1,20 @@
+FROM ubuntu:22.04
+CMD ["/bin/bash"]
+
+WORKDIR /app
+RUN mkdir -p /app
+RUN cd /app
+
+COPY . .
+RUN apt-get update \
+    && apt-get install -y curl \
+    && apt-get install -y libicu-dev \
+    && rm -rf /var/lib/apt/lists/*
+RUN curl -L -o app.tar.gz https://github.com/replaysMike/Binner/releases/download/v2.6.0/BinnerSetup-win10x64-2.6.0.exe
+RUN tar zxfp ./app.tar.gz
+
+RUN chmod +x ./install-as-service.sh
+RUN chmod +x Binner.Web
+
+EXPOSE 8090
+CMD pwd && ./Binner.Web
