@@ -21,7 +21,7 @@ jobs:
         id: assets
         run: |
           RELEASE_TAG=${{ steps.release.outputs.tag_name }}
-          ASSETS=$(curl --silent "https://api.github.com/repos/<username>/<repository>/releases/" | jq -r '.assets[].browser_download_url')
+          ASSETS=$(curl --silent "https://api.github.com/repos/replaysMike/Binner/releases/" | jq -r '.assets[].browser_download_url')
           echo "::set-output name=assets::${ASSETS}"
 
       - name: Create Dockerfile
