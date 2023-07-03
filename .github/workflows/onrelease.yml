@@ -37,27 +37,29 @@ jobs:
           fi
           for ASSET in $ASSETS; do
             PLATFORM=$(basename $ASSET | awk -F'_' '{print $NF}' | awk -F'-' '{print $1}')
-            DOCKERFILE="Dockerfile.${PLATFORM}"
-            echo "FROM ubuntu:22.04" > $DOCKERFILE
-            echo "CMD [\"/bin/bash\"]" >> $DOCKERFILE
-            echo "" >> $DOCKERFILE
-            echo "WORKDIR /app" >> $DOCKERFILE
-            echo "RUN mkdir -p /app" >> $DOCKERFILE
-            echo "RUN cd /app" >> $DOCKERFILE
-            echo "" >> $DOCKERFILE
-            echo "COPY . ." >> $DOCKERFILE
-            echo "RUN apt-get update \\" >> $DOCKERFILE
-            echo "    && apt-get install -y curl \\" >> $DOCKERFILE
-            echo "    && apt-get install -y libicu-dev \\" >> $DOCKERFILE
-            echo "    && rm -rf /var/lib/apt/lists/*" >> $DOCKERFILE
-            echo "RUN curl -L -o app.tar.gz $ASSET" >> $DOCKERFILE
-            echo "RUN tar zxfp ./app.tar.gz" >> $DOCKERFILE
-            echo "" >> $DOCKERFILE
-            echo "RUN chmod +x ./install-as-service.sh" >> $DOCKERFILE
-            echo "RUN chmod +x Binner.Web" >> $DOCKERFILE
-            echo "" >> $DOCKERFILE
-            echo "EXPOSE 8090" >> $DOCKERFILE
-            echo "CMD pwd && ./Binner.Web" >> $DOCKERFILE
+            if [[ "$PLATFORM" == "arm" || "$PLATFORM" == "arm64" || "$PLATFORM" == "x64" ]]; then
+              DOCKERFILE="Dockerfile.${PLATFORM}"
+              echo "FROM ubuntu:22.04" > $DOCKERFILE
+              echo "CMD [\"/bin/bash\"]" >> $DOCKERFILE
+              echo "" >> $DOCKERFILE
+              echo "WORKDIR /app" >> $DOCKERFILE
+              echo "RUN mkdir -p /app" >> $DOCKERFILE
+              echo "RUN cd /app" >> $DOCKERFILE
+              echo "" >> $DOCKERFILE
+              echo "COPY . ." >> $DOCKERFILE
+              echo "RUN apt-get update \\" >> $DOCKERFILE
+              echo "    && apt-get install -y curl \\" >> $DOCKERFILE
+              echo "    && apt-get install -y libicu-dev \\" >> $DOCKERFILE
+              echo "    && rm -rf /var/lib/apt/lists/*" >> $DOCKERFILE
+              echo "RUN curl -L -o app.tar.gz $ASSET" >> $DOCKERFILE
+              echo "RUN tar zxfp ./app.tar.gz" >> $DOCKERFILE
+              echo "" >> $DOCKERFILE
+              echo "RUN chmod +x ./install-as-service.sh" >> $DOCKERFILE
+              echo "RUN chmod +x Binner.Web" >> $DOCKERFILE
+              echo "" >> $DOCKERFILE
+              echo "EXPOSE 8090" >> $DOCKERFILE
+              echo "CMD pwd && ./Binner.Web" >> $DOCKERFILE
+            fi
           done
 
       - name: Configure Git
