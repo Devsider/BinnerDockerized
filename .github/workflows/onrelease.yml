@@ -20,7 +20,7 @@ jobs:
       - name: Get latest release info
         id: release
         run: |
-          LATEST_RELEASE=$(curl --silent "https://api.github.com/repos/replaysMike/Binner/releases/latest" | jq -r '.tag_name')
+          LATEST_RELEASE=$(curl --silent "https://api.github.com/repos/<username>/<repository>/releases/latest" | jq -r '.tag_name')
           if [[ -z "$LATEST_RELEASE" ]]; then
             echo "::error::Failed to retrieve latest release information."
             exit 1
@@ -31,7 +31,7 @@ jobs:
         id: assets
         run: |
           RELEASE_TAG=${{ steps.release.outputs.tag_name }}
-          RELEASE_ASSETS=$(curl --silent "https://api.github.com/repos/replaysMike/Binner/releases/tags/${RELEASE_TAG}" | jq -r '.assets')
+          RELEASE_ASSETS=$(curl --silent "https://api.github.com/repos/<username>/<repository>/releases/tags/${RELEASE_TAG}" | jq -r '.assets')
           if [[ "$RELEASE_ASSETS" == "null" ]]; then
             echo "::warning::No assets found for the latest release."
             exit 0
@@ -69,7 +69,8 @@ jobs:
             echo "RUN chmod +x Binner.Web" >> $DOCKERFILE
             echo "" >> $DOCKERFILE
             echo "EXPOSE 8090" >> $DOCKERFILE
-            echo "CMD pwd && ./Binner
+            echo "CMD pwd && ./Binner.Web" >> $DOCKERFILE
+          done
 
       - name: Commit and push Dockerfiles
         run: |
