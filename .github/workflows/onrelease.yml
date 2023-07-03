@@ -36,7 +36,7 @@ jobs:
             exit 0
           fi
           for ASSET in $ASSETS; do
-            PLATFORM=$(basename $ASSET | awk -F'_' '{print $NF}' | awk -F'-' '{print $1}')
+            PLATFORM=$(basename $ASSET | awk -F'-' '{print $2}')
             if [[ "$PLATFORM" == "arm" || "$PLATFORM" == "arm64" || "$PLATFORM" == "x64" ]]; then
               DOCKERFILE="Dockerfile.${PLATFORM}"
               echo "FROM ubuntu:22.04" > $DOCKERFILE
