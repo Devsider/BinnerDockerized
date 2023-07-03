@@ -1,7 +1,6 @@
 name: Generate Dockerfile
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
@@ -17,20 +16,39 @@ jobs:
       - name: Install jq
         run: sudo apt-get install jq
 
+      - name: Get latest release info
+        id: release
+        run: |
+          LATEST_RELEASE=$(curl --silent "https://api.github.com/repos/<username>/<repository>/releases/latest" | jq -r '.tag_name')
+          if [[ -z "$LATEST_RELEASE" ]]; then
+            echo "::error::Failed to retrieve latest release information."
+            exit 1
+          fi
+          echo "::set-output name=tag_name::${LATEST_RELEASE}"
+
       - name: Get release assets
         id: assets
         run: |
           RELEASE_TAG=${{ steps.release.outputs.tag_name }}
-          ASSETS=$(curl --silent "https://api.github.com/repos/replaysMike/Binner/releases/" | jq -r '.assets[].browser_download_url')
+          RELEASE_ASSETS=$(curl --silent "https://api.github.com/repos/replaysMike/Binner/releases/tags/${RELEASE_TAG}" | jq -r '.assets')
+          if [[ "$RELEASE_ASSETS" == "null" ]]; then
+            echo "::warning::No assets found for the latest release."
+            exit 0
+          fi
+          ASSETS=$(echo "$RELEASE_ASSETS" | jq -r '.[].browser_download_url')
           echo "::set-output name=assets::${ASSETS}"
 
       - name: Create Dockerfile
         run: |
           ASSETS=${{ steps.assets.outputs.assets }}
+          if [[ -z "$ASSETS" ]]; then
+            echo "::warning::No assets found for the latest release."
+            exit 0
+          fi
           for ASSET in $ASSETS; do
             PLATFORM=$(echo $ASSET | awk -F'/' '{ print $(NF-1) }')
             FILENAME=$(basename $ASSET)
-            DOCKERFILE="./dockerfiles/Dockerfile.${PLATFORM}"
+            DOCKERFILE="Dockerfile.${PLATFORM}"
             echo "FROM ubuntu:22.04" > $DOCKERFILE
             echo "CMD [\"/bin/bash\"]" >> $DOCKERFILE
             echo "" >> $DOCKERFILE
@@ -50,13 +68,4 @@ jobs:
             echo "RUN chmod +x Binner.Web" >> $DOCKERFILE
             echo "" >> $DOCKERFILE
             echo "EXPOSE 8090" >> $DOCKERFILE
-            echo "CMD pwd && ./Binner.Web" >> $DOCKERFILE
-          done
-          
-      - name: Commit and push Dockerfiles
-        run: |
-          git config -user.name "Devsider"
-          git add ./dockerfiles
-          git commit -m "Add Dockerfiles for release assets"
-          git push
-
+            echo "CMD pwd && ./Binner
