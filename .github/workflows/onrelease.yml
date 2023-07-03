@@ -17,33 +17,22 @@ jobs:
       - name: Install jq
         run: sudo apt-get install jq
 
-      - name: Get latest release info
-        id: release
+      - name: Get releases
+        id: releases
         run: |
-          LATEST_RELEASE=$(curl --silent "https://api.github.com/repos/<username>/<repository>/releases/latest" | jq -r '.tag_name')
-          if [[ -z "$LATEST_RELEASE" ]]; then
-            echo "::error::Failed to retrieve latest release information."
-            exit 1
-          fi
-          echo "::set-output name=tag_name::${LATEST_RELEASE}"
-
-      - name: Get release assets
-        id: assets
-        run: |
-          RELEASE_TAG=${{ steps.release.outputs.tag_name }}
-          RELEASE_ASSETS=$(curl --silent "https://api.github.com/repos/<username>/<repository>/releases/tags/${RELEASE_TAG}" | jq -r '.assets')
-          if [[ "$RELEASE_ASSETS" == "null" ]]; then
-            echo "::warning::No assets found for the latest release."
+          RELEASES=$(curl --silent "https://api.github.com/repos/replaysMike/Binner/releases")
+          if [[ "$RELEASES" == "null" ]]; then
+            echo "::warning::No releases found for the repository."
             exit 0
           fi
-          ASSETS=$(echo "$RELEASE_ASSETS" | jq -r '.[].browser_download_url')
+          ASSETS=$(echo "$RELEASES" | jq -r '.[].assets[].browser_download_url')
           echo "::set-output name=assets::${ASSETS}"
 
       - name: Create Dockerfile
         run: |
-          ASSETS=${{ steps.assets.outputs.assets }}
+          ASSETS=${{ steps.releases.outputs.assets }}
           if [[ -z "$ASSETS" ]]; then
-            echo "::warning::No assets found for the latest release."
+            echo "::warning::No assets found for the releases."
             exit 0
           fi
           for ASSET in $ASSETS; do
@@ -72,9 +61,13 @@ jobs:
             echo "CMD pwd && ./Binner.Web" >> $DOCKERFILE
           done
 
+      - name: Configure Git
+        run: |
+          git config --global user.name "Devsider"
+          git config --global user.email "deve@example.com"
+
       - name: Commit and push Dockerfiles
         run: |
-          git config --local user.name "Devsider"
           git add Dockerfile.*
-          git commit -m "Add Dockerfiles for release assets"
+          git commit -m "Add Dockerfiles for releases"
           git push
