@@ -70,3 +70,10 @@ jobs:
             echo "" >> $DOCKERFILE
             echo "EXPOSE 8090" >> $DOCKERFILE
             echo "CMD pwd && ./Binner
+
+      - name: Commit and push Dockerfiles
+        run: |
+          git config --local user.name "Devsider"
+          git add Dockerfile.*
+          git commit -m "Add Dockerfiles for release assets"
+          git push
